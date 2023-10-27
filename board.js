@@ -24,6 +24,12 @@ app.post("/posts",(req,res)=>{
         }
     )
 })
+
+app.get("/posts",(req,res)=>{
+    pool.query("SELECT * FROM post",(err,rows,fields)=>{
+        res.json({ result: rows })
+    })
+})
 app.listen(port,() =>{
     console.log(`Example app listening on port ${port}`)
 })
