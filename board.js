@@ -39,6 +39,20 @@ app.get("/posts/:id",(req,res)=>{
     })
 })
 
+app.delete("/posts/:id",(req,res)=>{
+    const id=req.params.id
+    pool.query("DELETE FROM post WHERE id = ?",
+        [id],
+        function(err,rows,fields){
+            if(rows.affectedRows===0){
+                res.status(404).json({result: null})
+            }else{
+                res.json({result: "ok"})
+            }
+        }
+    )
+})
+
 app.listen(port,() =>{
     console.log(`Example app listening on port ${port}`)
 })
