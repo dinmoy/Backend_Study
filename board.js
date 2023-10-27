@@ -30,6 +30,15 @@ app.get("/posts",(req,res)=>{
         res.json({ result: rows })
     })
 })
+
+app.get("/posts/:id",(req,res)=>{
+    const id=req.params.id
+    pool.query("SELECT * FROM post WHERE id = ?",[id],(err,rows,fields)=>{
+        if(rows.length===0) res.send({result:null})
+        else res.json({result: rows[0]})
+    })
+})
+
 app.listen(port,() =>{
     console.log(`Example app listening on port ${port}`)
 })
