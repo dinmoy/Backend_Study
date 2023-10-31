@@ -53,6 +53,30 @@ app.delete("/posts/:id",(req,res)=>{
     )
 })
 
+
+app.patch("/posts/:id",(req,res)=>{
+    const id=req.params.id
+    pool.query(
+        "SELECT * FROM post WHERE id = ?",
+        [id],
+        function(err,rows,fields){
+            if(rows.length===0) res.status(404).json({result:null})
+            else{
+                delete req.body.id
+                const modified=Object.assign(rows[0],req.body)
+                pool.query("UPDATE post SET title = ?, author = ?, content = ? WHERE id =?",
+                [modified.title,modified.author,modified.content,id],
+                function(err,rows,fields){
+                    if(err){
+                        res.status(400).json({result:err})
+                    }else{
+                        res.json({result:"ok"})
+                    }
+                })
+            }
+        }
+    )
+})
 app.listen(port,() =>{
     console.log(`Example app listening on port ${port}`)
 })
