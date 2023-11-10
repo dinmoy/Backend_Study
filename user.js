@@ -23,6 +23,15 @@ const pool=mysql.createPool({
     database: 'hozu'
 })
 
+//로그인 여부 확인 관련 미들웨어 추가
+const loginRequired=function(req,res,next){
+    if(req.session.user){
+        next()
+    }else{
+        res.status(440).json({result: "현재 로그인 상태가 아닙니다"})
+    }
+}
+
 app.post("/api/user",(req,res)=>{
     bcrypy.hash(req.body.password,SALT_ROUNDS,function(err,hash){
         pool.query(
