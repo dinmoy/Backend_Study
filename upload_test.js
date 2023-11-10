@@ -18,7 +18,9 @@ const storage=multer.diskStorage({
 
 //미들웨어 
 const upload = multer({storage})
+
 const app=express()
+
 
 app.post("/upload",upload.single("my_file"), (req,res)=>{
     //single : 파일 1개만
@@ -31,6 +33,7 @@ app.post("/photos",upload.array("photo"),(req,res) =>{
     console.log(req.files)
     res.send("ok")
 })
+
 app.listen(port,() =>{
     console.log(`Example app listening on port ${port}`)
 })
