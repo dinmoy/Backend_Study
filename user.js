@@ -1,9 +1,19 @@
 const express=require(`express`)
 const bodyParser=require('body-parser')
 const mysql=require('mysql2')
+const bcrypt=require('bcrypt')
+const session=require('express-session')
 
 const app=express()
-app.use(bodyParser.json())
+app.use(session({
+    secret: 'secret',
+    resave:false,
+    saveUninitialized:true,
+    cookie: {
+        maxAge: hour
+    }
+}))
+const SALT_ROUNDS=10
 
 const port=3000
 const pool=mysql.createPool({
@@ -13,24 +23,27 @@ const pool=mysql.createPool({
     database: 'hozu'
 })
 
-app.post("/posts",(req,res)=>{
-    pool.query(
-        "INSERT INTO post(email,password,name,roles,createdAt) VALUES(?,?,?,?,now())",
-        [req.body.email,req.body.password,req.body.name,req.body.roles],
-        (err,rows,fields)=>{
-            if(err) res.status(400).json({result: err})
-            else res.json({result:"ok"})
-        }
-    )
+app.post("/api/user",(req,res)=>{
+    bcrypy.hash(req.body.password,SALT_ROUNDS,function(err,hash){
+        pool.query(
+            "INSERT INTO post(email,password,name,roles,createdAt) VALUES(?,?,?,?,now())",
+            [req.body.email,hash,req.body.name,req.body.roles],
+            (err,rows,fields)=>{
+                if(err) res.status(400).json({result: err})
+                else res.json({result:"ok"})
+            }
+        )
+    })
+   
 })
 
-app.get("/posts",(req,res)=>{
+app.get("/api/user",(req,res)=>{
     pool.query("SELECT * FROM user",(err,rows,fields)=>{
         res.json({result: rows })
     })
 })
 
-app.get("/posts/:id",(req,res)=>{
+app.get("/api/user:id",(req,res)=>{
     const id=req.params.id
     pool.query("SELECT * FROM user WHERE id = ?",[id],(err,rows.fields)=>{
         if(rows.length===0) res.send({result:null})
@@ -38,9 +51,9 @@ app.get("/posts/:id",(req,res)=>{
     })
 })
 
-app.delete ("/posts/:id",(req,res)=>{
+app.delete ("/api/user:id",(req,res)=>{
     const id= req.params.id
-    pool.query("DELETE FORM post WHERE id = ?",
+    pool.query("DELETE FORM user WHERE id = ?",
     [id],
     function(err,rows,fields){
         if(rows,affectedRows===0){
@@ -49,4 +62,15 @@ app.delete ("/posts/:id",(req,res)=>{
             res.json({result:"ok"})
         }
     })
+})
+
+app.patch("/api/user/:id",(req,res)=>{
+    const id=req.params.id
+    pool.query(
+        "SELECT * FORM user WHERE id = ?",
+        [id],
+        function(err,rows,fields){
+            if(rows.length===0) res.status(404).
+        }
+    )
 })
